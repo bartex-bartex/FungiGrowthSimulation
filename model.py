@@ -9,9 +9,10 @@ class HyphaeEnd:
     y: int = 0
 
 class Model:
-    def __init__(self, height, width):
+    def __init__(self, height, width, growth_probability):
         self.height = height
         self.width = width
+        self.growth_probability = growth_probability
         self.frame_id = 0
         self.frame = np.zeros((height, width), dtype=np.int8)
         self.hyphae_ends = deque()
@@ -23,7 +24,7 @@ class Model:
 
         return self.frame
 
-    def next_frame(self) -> tuple[int, np.array]:
+    def next_frame(self) -> np.array:
         cells_to_append = []
 
         while self.hyphae_ends:
@@ -56,7 +57,7 @@ class Model:
 
         self.frame_id += 1
 
-        return self.frame_id, self.frame
+        return self.frame
     
     def _get_neighbours(self, hyphae_end: HyphaeEnd) -> list:
         offsets = [
@@ -77,8 +78,16 @@ class Model:
         return random.random() < probability
     
     def _get_growth_probability(self, cell_neighbors_cnt: int) -> float:
-        switch_dict = {
-            1: 0.125,
-        }
-        
-        return switch_dict.get(cell_neighbors_cnt, 0)  # Return 0 if value is not in the dictionary
+        return self.growth_probability.get(cell_neighbors_cnt, 0)  # Return 0 if value is not in the dictionary
+    
+    def get_radius(self):
+        pass
+
+    def get_density(self):
+        pass
+
+    def get_mass(self):
+        pass
+
+    def get_generation(self):
+        return self.frame_id
