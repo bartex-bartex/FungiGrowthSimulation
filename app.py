@@ -23,7 +23,7 @@ pygame.display.set_caption("Fungi Growth Simulation")
 
 screen = pygame.display.set_mode((display_height, display_width))  # surface that is main window default black
 clock = pygame.time.Clock()
-model = Model(height, width, growth_probabilities.probability_3)
+model = Model(height, width, growth_probabilities.probability_1)
 
 frame = model.saw_spore()
 display_frame(frame)
@@ -42,7 +42,13 @@ while running:
     display_frame(frame)
 
     frame_id = model.get_generation()
-    print(frame_id)
+    radius = model.get_radius()
+    mass = model.get_mass()
+    density = model.get_density()
+
+    print(frame_id, radius, mass, density)
+
+    # print(radius)
 
     if frame_id > MAX_GENERATIONS:
         running = False

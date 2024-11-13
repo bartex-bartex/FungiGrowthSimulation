@@ -79,15 +79,23 @@ class Model:
     
     def _get_growth_probability(self, cell_neighbors_cnt: int) -> float:
         return self.growth_probability.get(cell_neighbors_cnt, 0)  # Return 0 if value is not in the dictionary
-    
-    def get_radius(self):
-        pass
 
-    def get_density(self):
-        pass
+    def get_radius(self) -> np.float64:
+        center_x = self.height // 2
+        center_y = self.width // 2
 
-    def get_mass(self):
-        pass
+        min_x = center_x - min(self.hyphae_ends, key=lambda h: h.x).x
+        max_x = max(self.hyphae_ends, key=lambda h: h.x).x - center_x
+        min_y = center_y - min(self.hyphae_ends, key=lambda h: h.y).y
+        max_y = max(self.hyphae_ends, key=lambda h: h.y).y - center_y
 
-    def get_generation(self):
+        return np.mean([min_x, max_x, min_y, max_y])
+ 
+    def get_density(self) -> np.float64:
+        return np.sum(self.frame) / (np.pi * self.get_radius() ** 2)
+
+    def get_mass(self) -> np.float64:
+        return np.sum(self.frame)
+
+    def get_generation(self) -> int:
         return self.frame_id
