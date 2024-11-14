@@ -48,8 +48,6 @@ while running:
 
     print(frame_id, radius, mass, density)
 
-    # print(radius)
-
     if frame_id > MAX_GENERATIONS:
         running = False
 
