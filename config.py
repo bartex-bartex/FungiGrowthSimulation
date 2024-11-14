@@ -1,3 +1,5 @@
+import numpy as np
+
 class Config:
     """
     Configuration class holding constant values related to growth rate and survival time.
@@ -23,18 +25,18 @@ class Config:
     """
 
     SURVIVAL_TIME_WATER = {
-        11: 4,
-        33: 7,
-        51: 10,
-        75: 13,
-        80: -1
+        0: 0,
+        11: 4 * 24,
+        33: 7 * 24,
+        51: 10 * 24,
+        75: 13 * 24,
+        80 - np.finfo(np.float64).min: 16 * 24, 
+        80: np.finfo(np.float64).max
     }
     """
-    Dict[int, int]: Water availability-to-survival time mapping.
+    Dict[float, float]: Water availability-to-survival time mapping.
     
-    This dictionary shows the survival time (in days) of an organism at different water activity levels (%).
-    
-    A value of `-1` indicates that the organism has enough water to survive.
+    This dictionary shows the survival time (in hours) of an organism at different water activity levels (%).
     """
 
     GROWTH_RATE_MM_PER_DAY = 4
