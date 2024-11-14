@@ -31,12 +31,12 @@ class Config:
         51: 10 * 24,
         75: 13 * 24,
         80 - np.finfo(np.float64).min: 16 * 24, 
-        80: np.finfo(np.float64).max
+        80: 20 * 365 * 24  # TODO: find a better solution for this
     }
     """
     Dict[float, float]: Water availability-to-survival time mapping.
     
-    This dictionary shows the survival time (in hours) of an organism at different water activity levels (%).
+    This dictionary shows the survival time (in hours) of an fungi at different water availability levels (%).
     """
 
     GROWTH_RATE_MM_PER_DAY = 4
