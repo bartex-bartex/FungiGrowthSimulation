@@ -1,7 +1,6 @@
 import pygame
 import numpy as np
 import imageio
-import time
 
 from src.display import render_frame, render_text, render_final_message
 from src.conversions import surface_to_frame, frame_to_surface
@@ -9,8 +8,6 @@ from src.model import Model
 
 from params import Params
 from config import Config
-
-start = time.time()
 
 frame_scale = 2
 frame_height, frame_width = 300, 300
@@ -68,6 +65,3 @@ render_final_message(screen, message, 0, frame_height * frame_scale, (255, 0, 0)
 
 imageio.mimsave('fungi.gif', frames, fps=30)
 pygame.quit()
-
-end = time.time()
-print(f"Time elapsed: {end - start} seconds")

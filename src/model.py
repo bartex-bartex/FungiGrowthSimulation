@@ -13,13 +13,13 @@ class HyphaeEnd:
 
 @dataclass(eq=True)
 class BoundingBox:
-    offset_top: int = 0
-    offset_right: int = 0
-    offset_bottom: int = 0
-    offset_left: int = 0
+    top: int = 0
+    right: int = 0
+    bottom: int = 0
+    left: int = 0
 
     def mean_radius(self):
-        return (self.offset_top + self.offset_right + self.offset_bottom + self.offset_left) / 4
+        return (self.bottom - self.top + self.right - self.left) / 4
 
 @dataclass(frozen=True, eq=True)
 class Point:
@@ -55,7 +55,7 @@ class Model:
         self.frame_id += 1
         self.frame[self.center.x, self.center.y] = 1
         self.hyphae_ends.append(HyphaeEnd(self.center.x, self.center.y))
-        self.bounding_box = BoundingBox()
+        self.bounding_box = BoundingBox(self.center.x, self.center.y, self.center.x, self.center.y)
 
         return self.frame
 
@@ -82,10 +82,10 @@ class Model:
                     cells_to_append.append(cell)
                     has_grown = True
 
-                    self.bounding_box.offset_top = min(self.bounding_box.offset_top, cell.x)
-                    self.bounding_box.offset_bottom = max(self.bounding_box.offset_bottom, cell.x)
-                    self.bounding_box.offset_left = min(self.bounding_box.offset_left, cell.y)
-                    self.bounding_box.offset_right = max(self.bounding_box.offset_right, cell.y)
+                    self.bounding_box.top = min(self.bounding_box.top, cell.x)
+                    self.bounding_box.bottom = max(self.bounding_box.bottom, cell.x)
+                    self.bounding_box.left = min(self.bounding_box.left, cell.y)
+                    self.bounding_box.right = max(self.bounding_box.right, cell.y)
 
 
             # if haven't grown in the generation might grow in the next
@@ -133,7 +133,7 @@ class Model:
         if total == 1:
             return 0
 
-        return total / (np.pi * self.get_radius_in_pixels() ** 2)
+        return total / (np.pi * (self.get_radius_in_pixels() ** 2))
 
     def get_mass(self) -> np.float64:
         return np.sum(self.frame)
