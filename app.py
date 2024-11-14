@@ -3,7 +3,7 @@ import numpy as np
 import imageio
 import time
 
-from src.display import render_frame, render_text
+from src.display import render_frame, render_text, render_final_message
 from src.conversions import surface_to_frame, frame_to_surface
 from src.model import Model
 
@@ -62,6 +62,9 @@ while running and model.is_alive():
         running = False
 
     # clock.tick(100)
+
+message = "Fungi died - saving..." if not model.is_alive() else "Simulation finished - saving..."
+render_final_message(screen, message, 0, frame_height * frame_scale, (255, 0, 0))
 
 imageio.mimsave('fungi.gif', frames, fps=30)
 pygame.quit()

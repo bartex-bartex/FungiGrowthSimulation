@@ -142,5 +142,5 @@ class Model:
         return self.frame_id
     
     def is_alive(self) -> bool:
-        return self.frame_id < self.estimated_lifespan
+        return self.get_time_elapsed() < self.estimated_lifespan
     

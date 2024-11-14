@@ -15,7 +15,7 @@ class Params:
             1: 0.20
         }
 
-    RH = 70
+    RH = 75
 
     AW = 0.2
 
