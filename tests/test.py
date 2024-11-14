@@ -1,5 +1,5 @@
 from config import Config
-from utils import Utils
+from src.utils import Utils
 import matplotlib.pyplot as plt
 
 values = {}

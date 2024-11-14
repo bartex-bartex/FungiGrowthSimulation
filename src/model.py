@@ -1,8 +1,7 @@
 import numpy as np
-import random
 from collections import deque
 from dataclasses import dataclass
-from utils import Utils
+from src.utils import Utils
 from config import Config
 from params import Params
 
@@ -12,10 +11,26 @@ class HyphaeEnd:
     x: int = 0
     y: int = 0
 
+@dataclass(eq=True)
+class BoundingBox:
+    offset_top: int = 0
+    offset_right: int = 0
+    offset_bottom: int = 0
+    offset_left: int = 0
+
+    def mean_radius(self):
+        return (self.offset_top + self.offset_right + self.offset_bottom + self.offset_left) / 4
+
+@dataclass(frozen=True, eq=True)
+class Point:
+    x: int = 0
+    y: int = 0
+
 class Model:
     def __init__(self, height, width, config: Config, params: Params):
         self.height = height
         self.width = width
+        self.center = Point(height // 2, width // 2)
         self.frame_id = 0
         self.frame = np.zeros((height, width), dtype=np.int8)
         self.hyphae_ends = deque()
@@ -23,20 +38,24 @@ class Model:
         self.config = config
         self.params = params
 
-        # estimate lifespan based on water availability
+        # set rules simulating nutrients availability
+        self.nutrients = params.NUTRIENTS
+
+        # estimate lifespan based on WATER availability
         water_availability = self.params.AW * 100 + self.params.RH
         self.estimated_lifespan = Utils.get_interpolated_value(water_availability, self.config.SURVIVAL_TIME_WATER)
-        self.estimated_lifespan = self._get_probability_range(self.estimated_lifespan, 0.1)
+        self.estimated_lifespan = Utils.get_random_value_from_range(self.estimated_lifespan, 0.1)
 
-        # apply growth rate based on temperature
+        # alter growth rate based on TEMPERATURE
         self.growth_rate = Utils.get_interpolated_value(self.params.TEMP, self.config.GROWTH_RATE_TEMP)
-        for key in self.params.NUTRIENTS.keys():
-            self.params.NUTRIENTS[key] *= self.growth_rate
+        for key in self.nutrients.keys():
+            self.nutrients[key] *= self.growth_rate
 
     def saw_spore(self) -> np.array:
         self.frame_id += 1
-        self.frame[self.height//2, self.width//2] = 1
-        self.hyphae_ends.append(HyphaeEnd(self.height//2, self.width//2))
+        self.frame[self.center.x, self.center.y] = 1
+        self.hyphae_ends.append(HyphaeEnd(self.center.x, self.center.y))
+        self.bounding_box = BoundingBox()
 
         return self.frame
 
@@ -59,9 +78,15 @@ class Model:
                 # determine growth based on probability
                 growth_probability = self._get_growth_probability(cell_neighbors_cnt)
 
-                if (self._check_probability(growth_probability)):
+                if (Utils.simulate_probability(growth_probability)):
                     cells_to_append.append(cell)
                     has_grown = True
+
+                    self.bounding_box.offset_top = min(self.bounding_box.offset_top, cell.x)
+                    self.bounding_box.offset_bottom = max(self.bounding_box.offset_bottom, cell.x)
+                    self.bounding_box.offset_left = min(self.bounding_box.offset_left, cell.y)
+                    self.bounding_box.offset_right = max(self.bounding_box.offset_right, cell.y)
+
 
             # if haven't grown in the generation might grow in the next
             if not has_grown:
@@ -90,31 +115,25 @@ class Model:
         
         return neighbours
     
-    def _check_probability(self, probability: float) -> bool:
-        return random.random() < probability
-    
     def _get_growth_probability(self, cell_neighbors_cnt: int) -> float:
-        return self.params.NUTRIENTS.get(cell_neighbors_cnt, 0)  # Return 0 if value is not in the dictionary
+        return self.nutrients.get(cell_neighbors_cnt, 0)  # Return 0 if value is not in the dictionary
 
-    def _get_probability_range(self, value, deviation):
-        return random.uniform((1 - deviation) * value, (1 + deviation) * value)
-    
-    def get_radius(self) -> np.float64:
-        center_x = self.height // 2
-        center_y = self.width // 2
-
-        min_x = center_x - min(self.hyphae_ends, key=lambda h: h.x).x
-        max_x = max(self.hyphae_ends, key=lambda h: h.x).x - center_x
-        min_y = center_y - min(self.hyphae_ends, key=lambda h: h.y).y
-        max_y = max(self.hyphae_ends, key=lambda h: h.y).y - center_y
-
-        return np.mean([min_x, max_x, min_y, max_y])
+    def get_radius_in_pixels(self) -> np.float64:
+        return self.bounding_box.mean_radius()
  
+    def get_radius_in_mm(self) -> float:
+        return self.get_radius_in_pixels() * self.config.GROWTH_RATE_MM_PER_DAY / 24 * self.config.GROWTH_TIME_HOURS_PER_PIXEL
+    
     def get_time_elapsed(self) -> int:
-        return self.frame_id * Config.GROWTH_TIME_HOURS_PER_PIXEL
+        return self.frame_id * self.config.GROWTH_TIME_HOURS_PER_PIXEL
 
     def get_density(self) -> np.float64:
-        return np.sum(self.frame) / (np.pi * self.get_radius() ** 2)
+        total = np.sum(self.frame)
+
+        if total == 1:
+            return 0
+
+        return total / (np.pi * self.get_radius_in_pixels() ** 2)
 
     def get_mass(self) -> np.float64:
         return np.sum(self.frame)
@@ -125,5 +144,3 @@ class Model:
     def is_alive(self) -> bool:
         return self.frame_id < self.estimated_lifespan
     
-    def convert_pixel_to_mm(self, pixels: int) -> float:
-        return pixels * Config.GROWTH_RATE_MM_PER_DAY * Config.GROWTH_TIME_HOURS_PER_PIXEL / 24
