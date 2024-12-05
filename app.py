@@ -11,8 +11,9 @@ from config import Config
 
 frame_scale = 2
 frame_height, frame_width = 300, 300
-# 20 * lines + 5 * (lines - 1)
-stats_height, stats_width = 220, 300
+stats_height_lines = 9 * 10
+stats_height_gaps = 9 * 5
+stats_height, stats_width = stats_height_lines + stats_height_gaps, 300
 
 MAX_GENERATIONS = 150
 config = Config()
@@ -22,7 +23,7 @@ pygame.init()
 pygame.display.set_caption("Fungi Growth Simulation")
 
 frames = []
-screen = pygame.display.set_mode((frame_width * frame_scale, frame_height * frame_scale + stats_height))  # surface that is main window default black
+screen = pygame.display.set_mode((frame_width * frame_scale, frame_height * frame_scale + stats_height_lines * frame_scale + stats_height_gaps))  # surface that is main window default black
 clock = pygame.time.Clock()
 model = Model(frame_height, frame_width, config, params)
 
@@ -54,7 +55,7 @@ while running and model.is_alive():
         f"Mass (g):         {round(mass, 2)}",
         f"Density (g/mm^2): {round(density, 4)}"
     ]
-    render_text(screen, stats, 0, frame_height * frame_scale)
+    render_text(screen, stats, frame_scale, 0, frame_height * frame_scale)
     render_frame(screen, frame, frame_scale)
 
     frame_and_stats = surface_to_frame(screen)
@@ -67,7 +68,7 @@ while running and model.is_alive():
     # clock.tick(100)
 
 message = "Fungi died..." if not model.is_alive() else "Simulation ended."
-render_final_message(screen, message, 0, frame_height * frame_scale, (255, 0, 0))
+render_final_message(screen, message, frame_scale, 0, frame_height * frame_scale, (255, 0, 0))
 
 frame_and_stats = surface_to_frame(screen)
 frames.append(np.where(frame_and_stats, 255, 0).astype(np.uint8))
