@@ -132,14 +132,12 @@ class Model:
         return np.sum(self.frame) * self.config.BIOMASS_DENSITY_GRAMS_PER_MM2
     
     def get_density(self) -> np.float64:
-        # total = np.sum(self.frame)
+        radius = self.get_radius_in_mm()
 
-        # if total == 1:
-        #     return 0
+        if radius == 0:
+            return 0
 
-        # return total / (np.pi * (self.get_radius_in_pixels() ** 2)) * self.config.BIOMASS_DENSITY_GRAMS_PER_MM2
-
-        return self.get_mass() / (np.pi * (self.get_radius_in_mm() ** 2))
+        return self.get_mass() / (np.pi * (radius ** 2))
 
     def get_generation(self) -> int:
         return self.frame_id

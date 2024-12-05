@@ -11,9 +11,10 @@ from config import Config
 
 frame_scale = 2
 frame_height, frame_width = 300, 300
-stats_height, stats_width = 150, 300
+# 20 * lines + 5 * (lines - 1)
+stats_height, stats_width = 220, 300
 
-MAX_GENERATIONS = 250
+MAX_GENERATIONS = 150
 config = Config()
 params = Params()
 
@@ -43,8 +44,11 @@ while running and model.is_alive():
     nutrients_str = [f"{key}: {float(value):.2f}" for key, value in params.NUTRIENTS.items()]
     formatted_nutrients = "[" + ", ".join(nutrients_str) + "]"
     stats = [
-        f"NUTRIENTS:        {formatted_nutrients}, TEMP: {Params.TEMP}°C, RH: {Params.RH}%, AW: {Params.AW}",
-        f"Generation:       {frame_id}",
+        f"NUTRIENTS:        {formatted_nutrients}",
+        f"TEMP:             {Params.TEMP}°C",
+        f"RH:               {Params.RH}%",
+        f"AW:               {Params.AW}",
+        f"Generation:       {frame_id} / {MAX_GENERATIONS}",
         f"Time elapsed (h): {time_elapsed}",
         f"Radius (mm):      {round(radius_mm, 2)}",
         f"Mass (g):         {round(mass, 2)}",
