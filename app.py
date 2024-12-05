@@ -40,12 +40,14 @@ while running and model.is_alive():
     density = model.get_density()
     time_elapsed = model.get_time_elapsed()
 
+    nutrients_str = [f"{key}: {float(value):.2f}" for key, value in params.NUTRIENTS.items()]
+    formatted_nutrients = "[" + ", ".join(nutrients_str) + "]"
     stats = [
-        f"NUTRIENTS: {Params.NUTRIENTS}, TEMP: {Params.TEMP}°C, RH: {Params.RH}%, AW: {Params.AW}",
-        f"Generation: {frame_id}",
+        f"NUTRIENTS:        {formatted_nutrients}, TEMP: {Params.TEMP}°C, RH: {Params.RH}%, AW: {Params.AW}",
+        f"Generation:       {frame_id}",
         f"Time elapsed (h): {time_elapsed}",
-        f"Radius (mm): {round(radius_mm, 2)}",
-        f"Mass (g): {round(mass, 2)}",
+        f"Radius (mm):      {round(radius_mm, 2)}",
+        f"Mass (g):         {round(mass, 2)}",
         f"Density (g/mm^2): {round(density, 4)}"
     ]
     render_text(screen, stats, 0, frame_height * frame_scale)
@@ -60,8 +62,11 @@ while running and model.is_alive():
 
     # clock.tick(100)
 
-message = "Fungi died - saving..." if not model.is_alive() else "Simulation finished - saving..."
+message = "Fungi died..." if not model.is_alive() else "Simulation ended."
 render_final_message(screen, message, 0, frame_height * frame_scale, (255, 0, 0))
+
+frame_and_stats = surface_to_frame(screen)
+frames.append(np.where(frame_and_stats, 255, 0).astype(np.uint8))
 
 imageio.mimsave('fungi.gif', frames, fps=30)
 pygame.quit()

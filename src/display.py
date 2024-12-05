@@ -16,7 +16,7 @@ def render_text(screen: pygame.Surface, lines, x, y, color=(255, 255, 255)):
 
     fontSize = 20
     spaceBetweenLines = 5
-    font = pygame.font.SysFont('Arial', fontSize)
+    font = pygame.font.SysFont('monospace', fontSize)
     for line in lines:
         line_surface = font.render(line, True, color)
         screen.blit(line_surface, (x, y))
@@ -28,7 +28,7 @@ def render_final_message(screen: pygame.Surface, message, x, y, color=(255, 255,
 
     fontSize = 30
     spaceBetweenLines = 5
-    font = pygame.font.SysFont('Arial', fontSize)
+    font = pygame.font.SysFont('Space Mono', fontSize)
     line_surface = font.render(message, True, color)
     screen.blit(line_surface, (x, y - fontSize - spaceBetweenLines))
     
