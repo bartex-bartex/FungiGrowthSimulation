@@ -45,8 +45,8 @@ while running and model.is_alive():
         f"Generation: {frame_id}",
         f"Time elapsed (h): {time_elapsed}",
         f"Radius (mm): {round(radius_mm, 2)}",
-        f"Mass: {mass}",
-        f"Density: {round(density, 3)}"
+        f"Mass (g): {round(mass, 2)}",
+        f"Density (g/mm^2): {round(density, 4)}"
     ]
     render_text(screen, stats, 0, frame_height * frame_scale)
     render_frame(screen, frame, frame_scale)

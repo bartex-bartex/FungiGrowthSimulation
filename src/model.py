@@ -127,16 +127,19 @@ class Model:
     def get_time_elapsed(self) -> int:
         return self.frame_id * self.config.GROWTH_TIME_HOURS_PER_PIXEL
 
-    def get_density(self) -> np.float64:
-        total = np.sum(self.frame)
-
-        if total == 1:
-            return 0
-
-        return total / (np.pi * (self.get_radius_in_pixels() ** 2))
-
     def get_mass(self) -> np.float64:
-        return np.sum(self.frame)
+        # single cell = mm^2
+        return np.sum(self.frame) * self.config.BIOMASS_DENSITY_GRAMS_PER_MM2
+    
+    def get_density(self) -> np.float64:
+        # total = np.sum(self.frame)
+
+        # if total == 1:
+        #     return 0
+
+        # return total / (np.pi * (self.get_radius_in_pixels() ** 2)) * self.config.BIOMASS_DENSITY_GRAMS_PER_MM2
+
+        return self.get_mass() / (np.pi * (self.get_radius_in_mm() ** 2))
 
     def get_generation(self) -> int:
         return self.frame_id
