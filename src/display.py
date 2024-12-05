@@ -30,6 +30,6 @@ def render_final_message(screen: pygame.Surface, message, scale, x, y, color=(25
     spaceBetweenLines = 5
     font = pygame.font.SysFont('Space Mono', fontSize)
     line_surface = font.render(message, True, color)
-    screen.blit(line_surface, (x, y - fontSize - spaceBetweenLines))
+    screen.blit(line_surface, (x, y))
     
     pygame.display.flip()
