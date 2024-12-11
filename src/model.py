@@ -118,20 +118,21 @@ class Model:
     def _get_growth_probability(self, cell_neighbors_cnt: int) -> float:
         return self.nutrients.get(cell_neighbors_cnt, 0)  # Return 0 if value is not in the dictionary
 
-    def get_radius_in_pixels(self) -> np.float64:
+    def get_radius_in_pixels(self) -> np.float64:  # ok
         return self.bounding_box.mean_radius()
  
-    def get_radius_in_mm(self) -> float:
+    def get_radius_in_mm(self) -> float:  # ok
         return self.get_radius_in_pixels() * self.config.GROWTH_RATE_MM_PER_DAY / 24 * self.config.GROWTH_TIME_HOURS_PER_PIXEL
     
-    def get_time_elapsed(self) -> int:
+    def get_time_elapsed(self) -> int:  # ok
         return self.frame_id * self.config.GROWTH_TIME_HOURS_PER_PIXEL
 
-    def get_mass(self) -> np.float64:
-        # single cell = mm^2
-        return np.sum(self.frame) * self.config.BIOMASS_DENSITY_GRAMS_PER_MM2
+    def get_mass(self) -> np.float64:  # ok
+        # gdy teraz 2px = 1 mm, to 4pixele mieszczą się w 1mm^2
+        px2_to_mm2 = (self.config.GROWTH_RATE_MM_PER_DAY / 24 * self.config.GROWTH_TIME_HOURS_PER_PIXEL) ** 2
+        return np.sum(self.frame) * self.config.BIOMASS_DENSITY_GRAMS_PER_MM2 * px2_to_mm2
     
-    def get_density(self) -> np.float64:
+    def get_density(self) -> np.float64:  # ok
         radius = self.get_radius_in_mm()
 
         if radius == 0:
